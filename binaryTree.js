@@ -20,6 +20,33 @@ class Tree {
     deleteItem(value) {
         deleteItemFunction(this.root, value)
     }
+    find(value) {
+       return findFunction(this.root, value)
+    }
+    levelOrderSimple() {
+       return levelOrderSimpleFunction(this.root)
+    }
+    PreOrder() {
+      PreOrderFunction(this.root)
+    }
+    InOrder() {
+      InOrderFunction(this.root)
+    }
+    PostOrder() {
+      PostOrderFunction(this.root)
+    }
+    height(node) {
+     return heightFunction(node)
+    }
+    depth(node) {
+      return depthFunction(node, this.root)
+     }
+     isBalanced() {
+      return isBalancedFunction(this.root);
+     }
+     rebalance() {
+      this.root = rebalanceFunction(this.root) 
+     }
 }
 
 function buildTree(array) {
@@ -67,58 +94,129 @@ function insertFunction(root, data) {
    return root;
 }
 
-function getSuccessor(curr) {
-    curr = curr.right;
-    while (curr !== null && curr.left !== null) {
-        curr = curr.left;
-    }
-    return curr;
-}
-
-// This function deletes a given key x from the
-// given BST and returns the modified root of the
-// BST (if it is modified).
-function delNode(root, x) {
-    // Base case
+function deleteItemFunction(root, x) {
     if (root === null) {
         return root;
     }
-
-    // If key to be searched is in a subtree
-    if (root.key > x) {
-        root.left = delNode(root.left, x);
-    } else if (root.key < x) {
-        root.right = delNode(root.right, x);
+    if (root.data > x) {
+        root.left = deleteItemFunction(root.left, x);
+    } else if (root.data < x) {
+        root.right = deleteItemFunction(root.right, x);
     } else {
-        // If root matches with the given key
 
-        // Cases when root has 0 children or 
-        // only right child
         if (root.left === null) {
-            return null;
+            return root.right;
         }
-        // When root has only left child
         if (root.right === null) {
-            return null;
+            return root.left;
         }
-        // When both children are present
-        let succ = getSuccessor(root);
-       //console.log(succ)
-        root.key = succ.key;
-        root.right = delNode(root.right, succ.key);
+        let leftRight = deleteItemFunctionPart(root);
+        root.data = leftRight.data;
+        root.right = deleteItemFunction(root.right, leftRight.data);
     }
     return root;
 }
 
-
-
-let root = buildTree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-//root.insert(12)
-function testim() {
-    if (root.root.left.left.left == null) {
-    return root.root.left.left.right
-  }
+function deleteItemFunctionPart(root) {
+    leftRight = root.right;
+    while (leftRight !== null && leftRight.left !== null) {
+        leftRight = leftRight.left;
+    }
+    return leftRight;
 }
-testim()
-console.log(root.root.left.left)
-//console.log(buildTree([1,2,3,4]))
+
+function findFunction(root, data) {
+  if (root == null) return root;
+
+  if (data < root.data) {
+    root.left = findFunction(root.left, data);
+  } else if (data > root.data) {
+    root.right = findFunction(root.right, data);
+  } else {
+    if (data == root.data) {
+        value = root
+        return value
+    }
+  }
+ return value
+}
+
+function levelOrderSimpleFunction(root) {
+    if (root == null) return;
+    let queque = [];
+    let total = ""
+    queque.push(root)
+    while (queque.length > 0) {
+      let test = queque.shift();
+      total += test.data + ", "
+        if (test.left !== null) {
+          queque.push(test.left)
+        }
+        if (test.right !== null) {
+          queque.push(test.right)
+        }
+    }
+    return total.slice(0, -2)
+}
+
+function PreOrderFunction(root) {
+  if (root == null) return root;
+  console.log(root.data)
+  if (root.left !== null) PreOrderFunction(root.left);
+  if (root.right !== null) PreOrderFunction(root.right);
+}
+
+function InOrderFunction(root) {
+  if (root == null) return root;
+  if (root.left !== null) InOrderFunction(root.left);
+  console.log(root.data)
+  if (root.right !== null) InOrderFunction(root.right);
+}
+
+function PostOrderFunction(root) {
+  if (root == null) return root;
+  if (root.left !== null) PostOrderFunction(root.left);
+  if (root.right !== null) PostOrderFunction(root.right);
+  console.log(root.data)
+}
+
+function heightFunction(node) {
+  if (node == null) return null;
+  let left = heightFunction(node.left)
+  let right = heightFunction(node.right);
+
+  return Math.max(left, right) + 1
+}
+
+  function depthFunction(node, root, total = 0) {
+    if (node == null) return null;
+    if (node.data == root.data) {
+      tot = total
+    }
+    if (node.data < root.data) {
+      total += 1
+      depthFunction(node, root.left, total)
+    } else if (node.data > root.data) {
+      total += 1
+      depthFunction(node, root.right, total)
+    }
+      return tot
+  }
+
+function isBalancedFunction(root) {
+  let left = heightFunction(root.left);
+  let right = heightFunction(root.right);
+
+  if (left == right) console.log(true);
+  else console.log(false)
+}
+
+function rebalanceFunction(root) {
+  let arrText = levelOrderSimpleFunction(root).split(", ");
+  let arrNumbers = []
+  arrText.forEach(numb => arrNumbers.push(Number(numb)))
+  let newRoot = buildTree(arrNumbers);
+  return newRoot.root
+}
+
+module.exports = { Tree, buildTree }
